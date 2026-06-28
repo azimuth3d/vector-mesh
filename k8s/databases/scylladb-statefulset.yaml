@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: scylladb
+  namespace: rag-platform
+  labels:
+    app: scylladb
+spec:
+  serviceName: scylladb-headless
+  replicas: 3
+  selector:
+    matchLabels:
+      app: scylladb
+  template:
+    metadata:
+      labels:
+        app: scylladb
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node-role.kubernetes.io/compute
+                    operator: In
+                    values: ["ondemand"]
+      containers:
+        - name: scylladb
+          image: scylladb/scylla:5.4.0
+          ports:
+            - containerPort: 9042
+              name: cql
+            - containerPort: 9000
+              name: prometheus
+          resources:
+            requests:
+              cpu: "2"
+              memory: "4Gi"
+            limits:
+              cpu: "4"
+              memory: "8Gi"
+          args:
+            - "--smp"
+            - "2"
+            - "--memory"
+            - "4G"
+            - "--seed-provider-parameters"
+            - "seeds=scylladb-0.scylladb-headless.rag-platform.svc.cluster.local"
+          volumeMounts:
+            - name: scylla-data
+              mountPath: /var/lib/scylla
+  volumeClaimTemplates:
+    - metadata:
+        name: scylla-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 50Gi

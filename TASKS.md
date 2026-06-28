@@ -10,14 +10,14 @@ Task 1.2: APISIX & Cert-manager Setup
 Task 1.3: Argo CD Bootstrap
 [x] Write Argo CD Application manifests utilizing the "App of Apps" pattern. Configure Argo CD to point to the k8s/infrastructure/, k8s/databases/, and k8s/services/ directories within the Git repository, and enable Auto-sync.
 
-Phase 2: High-Performance Data & AI Layer
+[x] Phase 2: High-Performance Data & AI Layer
 Goal: Deploy all databases in a distributed architecture and configure Local LLMs.
 
-Task 2.1: ScyllaDB & Redis Deployment
+[x] Task 2.1: ScyllaDB & Redis Deployment
 
 Write Kubernetes StatefulSet and Headless Service manifests for a ScyllaDB cluster (3 nodes) and a Redis instance (for Queue/Cache). Additionally, design a highly optimized ScyllaDB CQL Schema for storing chat history. The schema must be designed without joins, prioritizing maximum Read/Write performance.
 
-Task 2.2: Qdrant & Ollama Deployment
+[x] Task 2.2: Qdrant & Ollama Deployment
 
 Write Kubernetes Deployment manifests for Qdrant (Vector Database) and Ollama (including the LLM model). Ensure the Ollama Pod has appropriate resource requests/limits and utilizes a Node Selector to force deployment onto GPU-enabled Spot Nodes.
 

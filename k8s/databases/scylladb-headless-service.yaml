@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: scylladb-headless
+  namespace: rag-platform
+  labels:
+    app: scylladb
+spec:
+  clusterIP: None
+  ports:
+    - port: 9042
+      name: cql
+    - port: 9000
+      name: prometheus
+  selector:
+    app: scylladb
