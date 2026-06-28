@@ -1,5 +1,5 @@
 use crate::error::{AppError, Result};
-use scylla::Session;
+use scylla::client::session::Session;
 use redis::Client;
 
 pub async fn init_scylla(uri: &str) -> Result<Session> {
