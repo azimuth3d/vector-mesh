@@ -1,0 +1,8 @@
+[workspace]
+members = [
+    "apps/shared-lib",
+    "apps/ingestion-service",
+    "apps/embedding-service",
+    "apps/query-service",
+]
+resolver = "2"
