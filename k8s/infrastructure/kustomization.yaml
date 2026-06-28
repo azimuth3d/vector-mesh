@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: rag-platform
+resources:
+  - istio/istiod.yaml
+  - istio/peer-authentication.yaml
+  - istio/node-affinity.yaml
+  - apisix/apisix.yaml
+  - cert-manager/cert-manager-controller.yaml
+  - cert-manager/cluster-issuer.yaml

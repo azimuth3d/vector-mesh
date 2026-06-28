@@ -1,0 +1,43 @@
+# Node Affinity Configuration for Workload Separation
+# StatefulSets (Databases) -> On-Demand Nodes
+# Stateless/AI Inference -> Spot Nodes
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: database-workload
+  namespace: rag-platform
+spec:
+  template:
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-type
+                operator: In
+                values:
+                - on-demand
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-inference-workload
+  namespace: rag-platform
+spec:
+  template:
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-type
+                operator: In
+                values:
+                - spot
+      tolerations:
+      - key: "node.kubernetes.io/spot-instance"
+        operator: "Exists"
+        effect: "NoSchedule"

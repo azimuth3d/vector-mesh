@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: rag-platform-app-of-apps
+  namespace: argocd
+spec:
+  generators:
+  - list:
+      elements:
+      - name: infrastructure
+        path: k8s/infrastructure
+      - name: databases
+        path: k8s/databases
+      - name: services
+        path: k8s/services
+  template:
+    metadata:
+      name: '{{name}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/<your-org>/enterprise-rag-platform.git
+        targetRevision: main
+        path: '{{path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: rag-platform
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+        - CreateNamespace=true
