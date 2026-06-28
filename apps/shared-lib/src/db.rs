@@ -1,5 +1,6 @@
 use crate::error::{AppError, Result};
-use scylla::client::session::{Session, SessionBuilder};
+use scylla::client::session::Session;
+use scylla::client::session_builder::SessionBuilder;
 use redis::Client;
 use std::sync::Arc;
 
