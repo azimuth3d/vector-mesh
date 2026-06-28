@@ -24,15 +24,15 @@ Write Kubernetes Deployment manifests for Qdrant (Vector Database) and Ollama (i
 Phase 3: Rust Microservices (Core Logic)
 Goal: Develop the backend using Rust and Axum, strictly adhering to Clean Architecture principles.
 
-Task 3.1: Shared Library & Observability Setup
+[x] Task 3.1: Shared Library & Observability Setup
 
 Create a Rust Library crate (shared-lib) containing the following core modules: 1. OpenTelemetry setup (OTLP Exporter), 2. Custom Error Handling for Axum, and 3. Database connection pools for ScyllaDB and Redis. Structure the code adhering to Clean Architecture principles.
 
-Task 3.2: Ingestion & Embedding Service
+[x] Task 3.2: Ingestion & Embedding Service
 
 Write a Rust Microservice (embedding-service) that acts as a Background Worker. It must pull data from the Redis Queue, perform text chunking, send API requests to an Embedding Model, and upsert the resulting vectors into Qdrant. All core logic must be wrapped with OpenTelemetry Spans (#[tracing::instrument]) for Distributed Tracing.
 
-Task 3.3: Query Service (RAG Logic)
+[x] Task 3.3: Query Service (RAG Logic)
 
 Write a Rust Axum API (query-service) that accepts HTTP POST requests. It should query Qdrant for the most relevant context, combine the context with Prompt Engineering, send the payload to Ollama via API, save the chat history to ScyllaDB, and return the result as a JSON response. The folder structure must strictly follow Clean Architecture (Domain, Use Cases, Infrastructure, Adapters).
 
