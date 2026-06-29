@@ -23,7 +23,7 @@ pub async fn call_ollama(prompt: &str) -> Result<String> {
 }
 
 pub async fn save_to_scylla(question: &str, answer: &str) -> Result<()> {
-    let session = init_scylla("scylla://scylla:9042")?;
+    let session = init_scylla("scylla://scylla:9042").await?;
     session.execute(
         "INSERT INTO chat_history (id, question, answer, timestamp) VALUES (uuid(), ?, ?, now())",
         (question, answer),

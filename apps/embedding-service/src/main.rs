@@ -2,8 +2,9 @@ use shared_lib::error::Result;
 use tracing::{info, instrument};
 use serde::Deserialize;
 use redis::AsyncCommands;
+use qdrant_client;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 struct QueueMessage {
     id: String,
     text: String,
@@ -65,10 +66,10 @@ async fn main() -> Result<()> {
 
     loop {
         let mut conn = redis_client
-            .get_async_connection()
+            .get_multiplexed_async_connection()
             .await
             .map_err(|e| shared_lib::error::AppError::Redis(e.to_string()))?;
-            
+        
         let raw_msg: Option<String> = conn.brpop("ingestion_queue", 0.0)
             .await
             .map_err(|e| shared_lib::error::AppError::Redis(e.to_string()))?;

@@ -1,4 +1,4 @@
-use shared_lib::{AppError, Result};
+use shared_lib::Result;
 
 #[tokio::main]
 async fn main() -> Result<()> {
