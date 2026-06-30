@@ -1,7 +1,7 @@
 use shared_lib::error::Result;
 use tracing::{info, instrument};
 use serde::Deserialize;
-use redis::AsyncCommands;
+use redis::commands::AsyncCommands;
 use qdrant_client;
 
 #[derive(Deserialize, Debug)]
@@ -34,13 +34,13 @@ async fn process_message(
         .map_err(|e| shared_lib::error::AppError::Internal(e.to_string()))?;
 
     for (chunk, embedding) in chunks.into_iter().zip(embeddings) {
-        let point = qdrant_client::models::PointStruct::new(
+        let point = qdrant_client::qdrant::PointStruct::new(
             msg.id.clone(),
             embedding,
             vec![("text".to_string(), chunk.into())],
         );
         qdrant_client
-            .upsert_points(qdrant_client::models::PointsSelector::from(qdrant_client::models::PointsList::new(vec![point])))
+            .upsert_points(qdrant_client::qdrant::PointsSelector::from(qdrant_client::qdrant::PointsList::new(vec![point])))
             .await
             .map_err(|e| shared_lib::error::AppError::Qdrant(e.to_string()))?;
     }
