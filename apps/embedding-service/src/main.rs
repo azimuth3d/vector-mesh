@@ -1,7 +1,6 @@
 use shared_lib::error::Result;
 use tracing::{info, instrument};
 use serde::Deserialize;
-use redis::commands::AsyncCommands;
 use qdrant_client;
 
 #[derive(Deserialize, Debug)]
