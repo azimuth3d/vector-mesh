@@ -3,7 +3,6 @@ use tracing::{info, instrument};
 use serde::Deserialize;
 use qdrant_client;
 use qdrant_client::Payload;
-use redis::AsyncCommands;
 
 #[derive(Deserialize, Debug)]
 struct QueueMessage {
@@ -38,7 +37,7 @@ async fn process_message(
         let payload: Payload = serde_json::json!({
             "text": chunk
         })
-        .try_into::<Payload>()
+        .try_into()
         .map_err(|e| shared_lib::error::AppError::Internal(e.to_string()))?;
 
         let point = qdrant_client::qdrant::PointStruct::new(
