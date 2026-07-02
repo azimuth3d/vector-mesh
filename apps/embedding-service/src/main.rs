@@ -3,6 +3,7 @@ use tracing::{info, instrument};
 use serde::Deserialize;
 use qdrant_client;
 use qdrant_client::Payload;
+use redis::AsyncCommands;
 
 #[derive(Deserialize, Debug)]
 struct QueueMessage {
@@ -34,10 +35,9 @@ async fn process_message(
         .map_err(|e| shared_lib::error::AppError::Internal(e.to_string()))?;
 
     for (chunk, embedding) in chunks.into_iter().zip(embeddings) {
-        let payload: Payload = serde_json::json!({
+        let payload: Payload = Payload::try_from(serde_json::json!({
             "text": chunk
-        })
-        .try_into()
+        }))
         .map_err(|e| shared_lib::error::AppError::Internal(e.to_string()))?;
 
         let point = qdrant_client::qdrant::PointStruct::new(
@@ -67,12 +67,12 @@ async fn main() -> Result<()> {
     tracing_subscriber::fmt::init();
     info!("Embedding service started");
 
-    let redis_client = shared_lib::db::init_redis("redis://redis:6379")?;
+    let redis_client: redis::Client = shared_lib::db::init_redis("redis://redis:6379")?;
     let qdrant_client = shared_lib::clients::init_qdrant("http://qdrant:6334")?;
 
     loop {
         let mut conn = redis_client
-            .get_async_connection()
+            .get_multiplexed_async_connection()
             .await
             .map_err(|e| shared_lib::error::AppError::Redis(e.to_string()))?;
         
