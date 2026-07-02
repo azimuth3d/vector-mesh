@@ -73,7 +73,7 @@ async fn main() -> Result<()> {
 
     loop {
         let mut conn = redis_client
-            .get_multiplexed_async_connection()
+            .get_async_connection()
             .await
             .map_err(|e| shared_lib::error::AppError::Redis(e.to_string()))?;
         
