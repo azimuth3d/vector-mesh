@@ -24,9 +24,14 @@ pub async fn call_ollama(prompt: &str) -> Result<String> {
 
 pub async fn save_to_scylla(question: &str, answer: &str) -> Result<()> {
     let session = init_scylla("scylla://scylla:9042").await?;
-    session.execute_unpaged(
-        "INSERT INTO chat_history (id, question, answer, timestamp) VALUES (uuid(), ?, ?, now())",
-        (question, answer),
-    ).await.map_err(|e| shared_lib::error::AppError::Database(e.to_string()))?;
+    let query = "INSERT INTO chat_history (id, question, answer, timestamp) VALUES (uuid(), ?, ?, now())";
+    let prepared = session
+        .prepare(query)
+        .await
+        .map_err(|e| shared_lib::error::AppError::Database(e.to_string()))?;
+    session
+        .execute_unpaged(&prepared, (question, answer))
+        .await
+        .map_err(|e| shared_lib::error::AppError::Database(e.to_string()))?;
     Ok(())
 }
