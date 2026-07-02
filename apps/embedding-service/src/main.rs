@@ -3,7 +3,6 @@ use tracing::{info, instrument};
 use serde::Deserialize;
 use qdrant_client;
 use qdrant_client::Payload;
-use redis::AsyncCommands;
 
 #[derive(Deserialize, Debug)]
 struct QueueMessage {
@@ -11,9 +10,8 @@ struct QueueMessage {
     text: String,
 }
 
-#[instrument(skip(redis_client, qdrant_client))]
+#[instrument(skip(qdrant_client))]
 async fn process_message(
-    redis_client: &redis::Client,
     qdrant_client: &qdrant_client::Qdrant,
     msg: QueueMessage,
 ) -> Result<()> {
@@ -67,7 +65,7 @@ async fn main() -> Result<()> {
     tracing_subscriber::fmt::init();
     info!("Embedding service started");
 
-    let redis_client: redis::Client = shared_lib::db::init_redis("redis://redis:6379")?;
+    let redis_client = shared_lib::db::init_redis("redis://redis:6379")?;
     let qdrant_client = shared_lib::clients::init_qdrant("http://qdrant:6334")?;
 
     loop {
@@ -75,16 +73,19 @@ async fn main() -> Result<()> {
             .get_multiplexed_async_connection()
             .await
             .map_err(|e| shared_lib::error::AppError::Redis(e.to_string()))?;
-        
-        let raw_msg: Option<String> = conn.brpop("ingestion_queue", 0.0)
+            
+        let raw_msg: Option<(String, String)> = redis::cmd("BRPOP")
+            .arg("ingestion_queue")
+            .arg(0)
+            .query_async(&mut conn)
             .await
             .map_err(|e| shared_lib::error::AppError::Redis(e.to_string()))?;
 
-        if let Some(raw_msg) = raw_msg {
+        if let Some((_, raw_msg)) = raw_msg {
             let msg: QueueMessage = serde_json::from_str(&raw_msg)
                 .map_err(|e| shared_lib::error::AppError::Internal(e.to_string()))?;
             
-            if let Err(e) = process_message(&redis_client, &qdrant_client, msg).await {
+            if let Err(e) = process_message(&qdrant_client, msg).await {
                 tracing::error!("Failed to process message: {}", e);
             }
         }
