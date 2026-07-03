@@ -1,10 +1,9 @@
-use shared_lib::error::Result;
-use tracing::{info, instrument};
-use serde::Deserialize;
 use qdrant_client;
 use qdrant_client::Payload;
-use redis::AsyncCommands;
-use tokio::time::{sleep, Duration};
+use serde::Deserialize;
+use shared_lib::error::Result;
+use tokio::time::{Duration, sleep};
+use tracing::{info, instrument};
 
 #[derive(Deserialize, Debug)]
 struct QueueMessage {
@@ -13,12 +12,9 @@ struct QueueMessage {
 }
 
 #[instrument(skip(qdrant_client))]
-async fn process_message(
-    qdrant_client: &qdrant_client::Qdrant,
-    msg: QueueMessage,
-) -> Result<()> {
+async fn process_message(qdrant_client: &qdrant_client::Qdrant, msg: QueueMessage) -> Result<()> {
     let chunks: Vec<String> = text_chunker(&msg.text);
-    
+
     let embedding_req = serde_json::json!({
         "model": "text-embedding-3-small",
         "input": chunks.clone()
@@ -40,13 +36,12 @@ async fn process_message(
         }))
         .map_err(|e| shared_lib::error::AppError::Internal(e.to_string()))?;
 
-        let point = qdrant_client::qdrant::PointStruct::new(
-            msg.id.clone(),
-            embedding,
-            payload,
-        );
+        let point = qdrant_client::qdrant::PointStruct::new(msg.id.clone(), embedding, payload);
         qdrant_client
-            .upsert_points(qdrant_client::qdrant::UpsertPointsBuilder::new("documents", vec![point]))
+            .upsert_points(qdrant_client::qdrant::UpsertPointsBuilder::new(
+                "documents",
+                vec![point],
+            ))
             .await
             .map_err(|e| shared_lib::error::AppError::Qdrant(e.to_string()))?;
     }
@@ -75,9 +70,10 @@ async fn main() -> Result<()> {
             .get_multiplexed_async_connection()
             .await
             .map_err(|e| shared_lib::error::AppError::Redis(e.to_string()))?;
-            
-        let raw_msg: Option<String> = conn
-            .rpop("ingestion_queue")
+
+        let raw_msg: Option<String> = redis::cmd("RPOP")
+            .arg("ingestion_queue")
+            .query_async(&mut conn)
             .await
             .map_err(|e| shared_lib::error::AppError::Redis(e.to_string()))?;
 
@@ -85,7 +81,7 @@ async fn main() -> Result<()> {
             Some(raw) => {
                 let msg: QueueMessage = serde_json::from_str(&raw)
                     .map_err(|e| shared_lib::error::AppError::Internal(e.to_string()))?;
-                
+
                 if let Err(e) = process_message(&qdrant_client, msg).await {
                     tracing::error!("Failed to process message: {}", e);
                 }
