@@ -3,6 +3,7 @@ use tracing::{info, instrument};
 use serde::Deserialize;
 use qdrant_client;
 use qdrant_client::Payload;
+use redis::AsyncCommands;
 
 #[derive(Deserialize, Debug)]
 struct QueueMessage {
@@ -74,10 +75,8 @@ async fn main() -> Result<()> {
             .await
             .map_err(|e| shared_lib::error::AppError::Redis(e.to_string()))?;
             
-        let raw_msg: Option<(String, String)> = redis::cmd("BRPOP")
-            .arg("ingestion_queue")
-            .arg(0)
-            .query_async(&mut conn)
+        let raw_msg: Option<(String, String)> = conn
+            .brpop("ingestion_queue", 0)
             .await
             .map_err(|e| shared_lib::error::AppError::Redis(e.to_string()))?;
 
