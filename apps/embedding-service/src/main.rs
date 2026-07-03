@@ -4,6 +4,7 @@ use serde::Deserialize;
 use qdrant_client;
 use qdrant_client::Payload;
 use redis::AsyncCommands;
+use tokio::time::{sleep, Duration};
 
 #[derive(Deserialize, Debug)]
 struct QueueMessage {
@@ -75,18 +76,21 @@ async fn main() -> Result<()> {
             .await
             .map_err(|e| shared_lib::error::AppError::Redis(e.to_string()))?;
             
-        let raw_msg: Option<(String, String)> = conn
-            .brpop("ingestion_queue", 0)
+        let raw_msg: Option<String> = conn
+            .rpop("ingestion_queue")
             .await
             .map_err(|e| shared_lib::error::AppError::Redis(e.to_string()))?;
 
-        if let Some((_, raw_msg)) = raw_msg {
-            let msg: QueueMessage = serde_json::from_str(&raw_msg)
-                .map_err(|e| shared_lib::error::AppError::Internal(e.to_string()))?;
-            
-            if let Err(e) = process_message(&qdrant_client, msg).await {
-                tracing::error!("Failed to process message: {}", e);
+        match raw_msg {
+            Some(raw) => {
+                let msg: QueueMessage = serde_json::from_str(&raw)
+                    .map_err(|e| shared_lib::error::AppError::Internal(e.to_string()))?;
+                
+                if let Err(e) = process_message(&qdrant_client, msg).await {
+                    tracing::error!("Failed to process message: {}", e);
+                }
             }
+            None => sleep(Duration::from_millis(500)).await,
         }
     }
 }
