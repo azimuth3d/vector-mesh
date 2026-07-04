@@ -1,0 +1,25 @@
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: rag-platform-route
+  namespace: rag-platform
+spec:
+  http:
+    - name: query-service-route
+      match:
+        paths:
+          - /api/query
+        methods:
+          - POST
+      backends:
+        - serviceName: query-service
+          servicePort: 8080
+    - name: ingestion-service-route
+      match:
+        paths:
+          - /api/ingest
+        methods:
+          - POST
+      backends:
+        - serviceName: ingestion-service
+          servicePort: 8080

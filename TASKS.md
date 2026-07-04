@@ -39,11 +39,11 @@ Write a Rust Axum API (query-service) that accepts HTTP POST requests. It should
 🔍 Phase 4: Observability & Service Mesh Routing
 Goal: Achieve complete observability (Tracing) and manage traffic effectively via Istio.
 
-Task 4.1: OpenTelemetry Collector & Jaeger
+[x] Task 4.1: OpenTelemetry Collector & Jaeger
 
 Write Kubernetes Manifests to deploy an OpenTelemetry Collector as a DaemonSet to receive data via OTLP gRPC. Configure it to export telemetry data to a Jaeger instance (All-in-one deployment) to visualize Distributed Tracing across all microservices.
 
-Task 4.2: APISIX to Istio Routing
+[x] Task 4.2: APISIX to Istio Routing
 
 Write APISIX Route configurations and Istio VirtualService manifests. The system must accept external HTTPS traffic via APISIX and route it securely to the query-service and ingestion-service utilizing Istio's mTLS layer.
 

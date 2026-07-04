@@ -1,0 +1,27 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: query-service-vs
+  namespace: rag-platform
+spec:
+  hosts:
+    - query-service
+  gateways:
+    - mesh
+  http:
+    - route:
+        - destination:
+            host: query-service
+            port:
+              number: 8080
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: query-service-dr
+  namespace: rag-platform
+spec:
+  host: query-service
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL

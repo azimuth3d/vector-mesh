@@ -1,0 +1,27 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: ingestion-service-vs
+  namespace: rag-platform
+spec:
+  hosts:
+    - ingestion-service
+  gateways:
+    - mesh
+  http:
+    - route:
+        - destination:
+            host: ingestion-service
+            port:
+              number: 8080
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: ingestion-service-dr
+  namespace: rag-platform
+spec:
+  host: ingestion-service
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
