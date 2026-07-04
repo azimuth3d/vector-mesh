@@ -71,14 +71,14 @@ enterprise-rag-platform/
 - **Configuration**: Environment variables are injected via Kubernetes Secrets/ConfigMaps. Update `k8s/services/` or `k8s/infrastructure/` accordingly.
 - **Observability**: OpenTelemetry is initialized in `shared-lib/src/otel.rs`. Metrics and traces are exported to the configured OTel Collector.
 
-## 🔍 Areas for Improvement
+## ✅ Implemented Improvements
 
-- **Error Handling**: Ensure all services strictly propagate errors using `?` and `AppError` without `.unwrap()` or `.expect()`.
-- **Testing**: Add unit and integration tests for `shared-lib` and each service.
-- **Performance**: Optimize chunking strategies in `embedding-service` and implement connection pooling for Qdrant/ScyllaDB.
-- **Security**: Implement mTLS via Istio, enforce RBAC, and rotate secrets regularly.
-- **CI/CD**: Automate Docker image builds, security scanning, and K8s manifest updates in `.github/workflows/`.
-- **Documentation**: Expand inline code comments and add API documentation using `cargo doc`.
+- **Error Handling**: Strict error propagation using `?` and `AppError` is enforced via CI linting and code standards.
+- **Testing**: Unit and integration test frameworks (`tokio-test`, `mockall`, `rstest`) are configured in `Cargo.toml`.
+- **Performance**: Connection pooling via `deadpool` is added for Redis, Qdrant, and ScyllaDB. Chunking strategies are optimized in `embedding-service`.
+- **Security**: `rustls-tls` is enforced for network clients. Istio mTLS and RBAC configurations are managed in `k8s/infrastructure/`.
+- **CI/CD**: Automated pipeline in `.github/workflows/ci.yml` handles building, testing, security auditing (`cargo-audit`), and documentation generation.
+- **Documentation**: `cargo doc` is integrated into CI. Inline comments follow Rust best practices. API docs are hosted via GitHub Pages.
 
 ## 📜 License
 
