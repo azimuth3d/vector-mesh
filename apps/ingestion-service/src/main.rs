@@ -17,17 +17,15 @@ async fn ingest_handler(
 ) -> Result<(StatusCode, Json<serde_json::Value>)> {
     let mut con = state
         .redis_client
-        .get_multiplexed_async_connection()
+        .get_async_connection()
         .await
         .map_err(|e| shared_lib::AppError::Redis(e.to_string()))?;
 
     let payload =
         serde_json::to_string(&msg).map_err(|e| shared_lib::AppError::Internal(e.to_string()))?;
 
-    let _: () = redis::cmd("RPUSH")
-        .arg("documents:queue")
-        .arg(&payload)
-        .query_async(&mut con)
+    let _: () = con
+        .rpush("documents:queue", &payload)
         .await
         .map_err(|e| shared_lib::AppError::Redis(e.to_string()))?;
 
