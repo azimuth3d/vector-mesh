@@ -17,7 +17,7 @@ async fn ingest_handler(
     State(state): State<AppState>,
     Json(msg): Json<IngestionMessage>,
 ) -> Result<(StatusCode, Json<serde_json::Value>)> {
-    let mut con = state.redis_client.get_async_connection().await
+    let mut con = state.redis_client.get_multiplexed_async_connection().await
         .map_err(|e| shared_lib::AppError::Redis(e.to_string()))?;
     
     let payload = serde_json::to_string(&msg)

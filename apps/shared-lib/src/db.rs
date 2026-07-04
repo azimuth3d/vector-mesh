@@ -13,8 +13,8 @@ pub async fn init_scylla(uri: &str) -> Result<Arc<Session>> {
     Ok(Arc::new(session))
 }
 
-pub fn init_redis(uri: &str) -> Result<Client> {
-    let client = Client::open(uri)
+pub fn init_redis(uri: &str) -> Result<redis::Client> {
+    let client = redis::Client::open(uri)
         .map_err(|e| AppError::Redis(e.to_string()))?;
     Ok(client)
 }
