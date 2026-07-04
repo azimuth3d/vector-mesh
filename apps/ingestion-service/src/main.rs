@@ -6,11 +6,11 @@ use axum::{
     Router,
 };
 use redis::AsyncCommands;
-use shared_lib::{db::init_redis, domain::IngestionMessage, error::Result};
+use shared_lib::{db::{init_redis, RedisClient}, domain::IngestionMessage, error::Result};
 
 #[derive(Clone)]
 struct AppState {
-    redis_client: redis::Client,
+    redis_client: RedisClient,
 }
 
 async fn ingest_handler(
