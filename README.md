@@ -6,6 +6,8 @@ A high-performance, multitenant chatbot system built with Rust, designed for onl
 
 The system follows a **Vector Mesh** pattern, decoupling ingestion, embedding, and querying into independent microservices orchestrated via Kubernetes and Argo CD.
 
+![Architecture Overview](279eff97-0663-4c9d-aaac-352125cbc4c6.jpeg)
+
 - **apps/**: Source code for Rust microservices.
 - **k8s/**: Kubernetes manifests managed by Argo CD.
 - **Data Flow**:
