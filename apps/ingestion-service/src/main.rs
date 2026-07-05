@@ -14,7 +14,7 @@ struct AppState {
 async fn ingest_handler(
     State(state): State<AppState>,
     Json(msg): Json<IngestionMessage>,
-) -> Result<(StatusCode, Json<serde_json::Value>)> {
+) -> std::result::Result<(StatusCode, Json<serde_json::Value>), shared_lib::error::AppError> {
     let mut con = state
         .redis_client
         .get_multiplexed_async_connection()
