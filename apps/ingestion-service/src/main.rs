@@ -1,5 +1,5 @@
 use axum::{Router, extract::State, http::StatusCode, response::Json, routing::post};
-use redis::AsyncCommands;
+use redis::{AsyncCommands, RedisResult};
 use shared_lib::{
     db::{RedisClient, init_redis},
     domain::IngestionMessage,
@@ -25,7 +25,7 @@ async fn ingest_handler(
         serde_json::to_string(&msg).map_err(|e| shared_lib::AppError::Internal(e.to_string()))?;
 
     let _: () = con
-        .rpush("documents:queue", &payload)
+        .rpush("documents:queue", payload)
         .await
         .map_err(|e| shared_lib::AppError::Redis(e.to_string()))?;
 
