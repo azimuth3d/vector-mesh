@@ -1,5 +1,5 @@
 use axum::{Router, extract::State, http::StatusCode, response::Json, routing::post};
-use redis::{AsyncCommands, RedisResult};
+use redis::AsyncCommands;
 use shared_lib::{
     db::{RedisClient, init_redis},
     domain::IngestionMessage,
@@ -17,7 +17,7 @@ async fn ingest_handler(
 ) -> Result<(StatusCode, Json<serde_json::Value>)> {
     let mut con = state
         .redis_client
-        .get_async_connection()
+        .get_multiplexed_async_connection()
         .await
         .map_err(|e| shared_lib::AppError::Redis(e.to_string()))?;
 
