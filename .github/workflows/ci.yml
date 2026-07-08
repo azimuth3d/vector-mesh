@@ -52,6 +52,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and Push Ingestion Service
         uses: docker/build-push-action@v5
+        env:
+          BUILDKIT_PROGRESS: plain
         with:
           context: ./apps/ingestion-service
           push: false
@@ -62,6 +64,8 @@ jobs:
           provenance: false
       - name: Build and Push Embedding Service
         uses: docker/build-push-action@v5
+        env:
+          BUILDKIT_PROGRESS: plain
         with:
           context: ./apps/embedding-service
           push: false
@@ -72,6 +76,8 @@ jobs:
           provenance: false
       - name: Build and Push Query Service
         uses: docker/build-push-action@v5
+        env:
+          BUILDKIT_PROGRESS: plain
         with:
           context: ./apps/query-service
           build-args: |

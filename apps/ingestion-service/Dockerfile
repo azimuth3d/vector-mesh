@@ -3,6 +3,14 @@ FROM rust:1.89-slim AS builder
 
 WORKDIR /app
 ENV CARGO_NET_RETRY=3
+ENV CARGO_BUILD_JOBS=2
+
+# ถ้าใช้ Git dependencies บางทีมีปัญหา Out of memory ตอน fetch
+ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
+ENV CARGO_BUILD_JOBS=2
+
+# ถ้าใช้ Git dependencies บางทีมีปัญหา Out of memory ตอน fetch
+ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
 
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential pkg-config libssl-dev clang libsqlite3-dev && rm -rf /var/lib/apt/lists/*
 
