@@ -2,8 +2,9 @@
 FROM rust:1.89-slim AS builder
 
 WORKDIR /app
+ENV CARGO_NET_RETRY=3
 
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential pkg-config libssl-dev && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential pkg-config libssl-dev clang libsqlite3-dev && rm -rf /var/lib/apt/lists/*
 
 COPY . .
 
