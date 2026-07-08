@@ -7,7 +7,7 @@ ENV CARGO_BUILD_JOBS=2
 
 # ถ้าใช้ Git dependencies บางทีมีปัญหา Out of memory ตอน fetch
 ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
-ENV CARGO_BUILD_JOBS=2
+ENV CARGO_BUILD_JOBS=1
 
 # ถ้าใช้ Git dependencies บางทีมีปัญหา Out of memory ตอน fetch
 ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends build-essential
 
 COPY . .
 
-RUN cargo build --release
+RUN cargo build --release --verbose
 
 RUN strip target/release/ingestion-service
 
