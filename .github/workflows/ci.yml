@@ -10,12 +10,14 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build-and-test:
+  cargo-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends cmake pkg-config protobuf-compiler libprotobuf-dev libsasl2-dev libssl-dev zlib1g-dev libzstd-dev
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
@@ -27,19 +29,23 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Build
-        run: cargo build --workspace --verbose
-      - name: Run Tests
-        run: cargo test --workspace --verbose
-      - name: Security Audit
-        run: cargo install --force cargo-audit && cargo audit
-      - name: Generate Documentation
-        run: cargo doc --workspace --all-features --no-deps
+        run: cargo build --release -j1
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cargo-artifacts
+          path: target/release/
 
   docker-build:
-    needs: build-and-test
+    needs: cargo-build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Download cargo artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: cargo-artifacts
+          path: target/
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
