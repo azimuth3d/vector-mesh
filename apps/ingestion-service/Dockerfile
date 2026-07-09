@@ -1,24 +1,7 @@
 # syntax=docker/dockerfile:1
 FROM rust:1.89-slim AS builder
-
 WORKDIR /app
-ENV CARGO_NET_RETRY=3
-ENV CARGO_BUILD_JOBS=2
-
-# ถ้าใช้ Git dependencies บางทีมีปัญหา Out of memory ตอน fetch
-ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
-ENV CARGO_BUILD_JOBS=1
-
-# ถ้าใช้ Git dependencies บางทีมีปัญหา Out of memory ตอน fetch
-ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
-
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential pkg-config libssl-dev clang libsqlite3-dev && rm -rf /var/lib/apt/lists/*
-
-COPY . .
-
-RUN cargo build --release --verbose
-
-RUN strip target/release/ingestion-service
+COPY target/release/ingestion-service /app/ingestion-service
 
 FROM debian:bookworm-slim
 
@@ -28,7 +11,7 @@ RUN apt-get update && \
 
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
-COPY --from=builder /app/target/release/ingestion-service /usr/local/bin/ingestion-service
+COPY --from=builder /app/ingestion-service /usr/local/bin/ingestion-service
 
 USER appuser
 
