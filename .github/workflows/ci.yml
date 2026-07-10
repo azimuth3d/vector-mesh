@@ -45,7 +45,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: cargo-artifacts
-          path: target/
+          path: target/release/
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -61,7 +61,8 @@ jobs:
         env:
           BUILDKIT_PROGRESS: plain
         with:
-          context: ./apps/ingestion-service
+          context: .
+          file: ./apps/ingestion-service/Dockerfile
           push: false
           build-args: |
             BUILDKIT_INLINE_CACHE=1
@@ -73,8 +74,9 @@ jobs:
         env:
           BUILDKIT_PROGRESS: plain
         with:
-          context: ./apps/embedding-service
-          push: false
+          context: .
+          file: ./apps/embedding-service/Dockerfile
+          push: true
           build-args: |
             BUILDKIT_INLINE_CACHE=1
           tags: ghcr.io/${{ github.repository }}/embedding:${{ github.sha }}
@@ -85,10 +87,11 @@ jobs:
         env:
           BUILDKIT_PROGRESS: plain
         with:
-          context: ./apps/query-service
+          context: .
+          file: ./apps/query-service/Dockerfile
           build-args: |
             BUILDKIT_INLINE_CACHE=1
-          push: false
+          push: true
           tags: ghcr.io/${{ github.repository }}/query:${{ github.sha }}
           no-cache: true
           provenance: false

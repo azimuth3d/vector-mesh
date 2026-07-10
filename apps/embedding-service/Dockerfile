@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
-FROM rust:1.89-slim AS builder
+FROM rust:1.89-slim
 WORKDIR /app
-COPY ../target/release/embedding-service /app/embedding-service
+COPY target/release/embedding-service /app/embedding-service
 
 FROM debian:bookworm-slim
 
