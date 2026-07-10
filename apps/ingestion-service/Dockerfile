@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 FROM rust:1.89-slim AS builder
 WORKDIR /app
-COPY target/release/ingestion-service /app/ingestion-service
+COPY ../target/release/ingestion-service /app/ingestion-service
 
 FROM debian:bookworm-slim
 

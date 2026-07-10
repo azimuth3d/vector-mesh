@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 FROM rust:1.89-slim AS builder
 WORKDIR /app
-COPY target/release/query-service /app/query-service
+COPY ../target/release/query-service /app/query-service
 
 FROM debian:bookworm-slim
 
