@@ -9,7 +9,8 @@ mod adapters;
 #[tokio::main]
 async fn main() -> Result<()> {
     tracing_subscriber::fmt::init();
-    info!("Query service started");
+    let provider = std::env::var("LLM_PROVIDER").unwrap_or_else(|_| "ollama".to_string());
+    info!("Query service started with LLM provider: {}", provider);
 
     let app = adapters::router();
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await?;
