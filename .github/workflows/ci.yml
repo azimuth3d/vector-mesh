@@ -9,6 +9,10 @@ on:
 env:
   CARGO_TERM_COLOR: always
 
+permissions:
+    contents: read
+    packages: write
+
 jobs:
   cargo-build:
     runs-on: ubuntu-latest
