@@ -1,8 +1,4 @@
 # syntax=docker/dockerfile:1
-FROM rust:1.89-slim
-WORKDIR /app
-COPY target/release/ingestion-service /app/ingestion-service
-
 FROM debian:bookworm-slim
 
 RUN apt-get update && \
@@ -11,7 +7,7 @@ RUN apt-get update && \
 
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
-COPY --from=builder /app/ingestion-service /usr/local/bin/ingestion-service
+COPY target/release/ingestion-service /app/ingestion-service
 
 USER appuser
 

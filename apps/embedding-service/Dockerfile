@@ -1,8 +1,4 @@
 # syntax=docker/dockerfile:1
-FROM rust:1.89-slim
-WORKDIR /app
-COPY target/release/embedding-service /app/embedding-service
-
 FROM debian:bookworm-slim
 
 RUN apt-get update && \
@@ -11,7 +7,7 @@ RUN apt-get update && \
 
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
-COPY --from=builder /app/embedding-service /usr/local/bin/embedding-service
+COPY target/release/embedding-service /app/embedding-service
 
 USER appuser
 

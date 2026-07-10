@@ -1,7 +1,4 @@
 # syntax=docker/dockerfile:1
-FROM rust:1.89-slim
-WORKDIR /app
-COPY target/release/query-service /app/query-service
 
 FROM debian:bookworm-slim
 
@@ -10,8 +7,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 RUN groupadd -r appuser && useradd -r -g appuser appuser
-
-COPY --from=builder /app/query-service /usr/local/bin/query-service
+COPY target/release/query-service /app/query-service
 
 USER appuser
 
